@@ -5,14 +5,17 @@ public class Food implements Comparable<Food>{
 	private String display_name;
 	private Integer porzioni;
 	
+	
 	/**
 	 * @param food_code
+	 * @param display_name
 	 */
-	public Food(Integer food_code) {
+	public Food(Integer food_code, String display_name) {
 		super();
 		this.food_code = food_code;
+		this.display_name = display_name;
 	}
-	/**
+	/*
 	 * 
 	 * @param food_code
 	 * @param display_name

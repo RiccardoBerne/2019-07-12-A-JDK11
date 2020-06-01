@@ -13,11 +13,13 @@ import it.polito.tdp.food.db.FoodDao;
 
 public class Model {
 	private FoodDao dao;
+	private Simulatore sim;
 	private Graph<Food, DefaultWeightedEdge> grafo;
 	private List<Food> cibi;
 
 	public Model() {
 		this.dao = new FoodDao();
+		this.sim = new Simulatore();
 	}
 
 	public void creaGrafo(Integer porzione) {
@@ -37,54 +39,33 @@ public class Model {
 			}
 		}
 		System.out.println(this.grafo.edgeSet().size() + "\n");
-
+		
 	}
-
 	public List<Food> getListFood() {
 		Collections.sort(this.cibi);
 		return this.cibi;
 	}
-
-	private List<Food> bestVicini;
-
-	public List<Food> getNeighborFood(Food food) {
+	
+	
+	public List<Calorie> getNeighborFood(Food food) {
+		List<Calorie> bestVicini= new ArrayList<>();
 		List<Food> vicini = Graphs.neighborListOf(this.grafo, food);
-		List<Food> parziale = new ArrayList<>();
-		bestVicini = new ArrayList<Food>();
-		ricorsione(vicini, parziale, food);
+		for(Food v: vicini) {
+			Calorie c= new Calorie(v,this.grafo.getEdgeWeight(this.grafo.getEdge(food, v)));
+			bestVicini.add(c);
+		}
+		Collections.sort(bestVicini);
 		return bestVicini;
 
 	}
 
-	private void ricorsione(List<Food> vicini, List<Food> parziale, Food food) {
-		Integer pesoP = -1;
-		Integer pesoB = -1;
-		for (Food f : parziale) {
-			pesoP += (int) this.grafo.getEdgeWeight(this.grafo.getEdge(food, f));
-		}
-		if (bestVicini.size() > 0) {
-			for (Food f : bestVicini) {
-				pesoB += (int) this.grafo.getEdgeWeight(this.grafo.getEdge(food, f));
-			}
-			if (pesoP > pesoB) {
-				this.bestVicini = new ArrayList<>(parziale);
-				return;
-			}
-		}else {
-			this.bestVicini= new ArrayList<>(parziale);
-		}
-		// Integer peso = countPeso+
-		// (int)this.grafo.getEdgeWeight(this.grafo.getEdge(food, f));
-		Integer countPeso = -1;
-		for (Food f : vicini) {
-			if (!parziale.contains(f)) {
-				parziale.add(f);
-				ricorsione(vicini, parziale, food);
-				parziale.remove(f);
-			}
-
-		}
-
+	public void simula(Food food, Integer k) {
+		this.sim.inizializzazione(food, this.grafo, k);
+		this.sim.run();
+		
 	}
-
+	public Statistiche getStats() {
+		return this.sim.getStatistiche();
+	}
+	
 }

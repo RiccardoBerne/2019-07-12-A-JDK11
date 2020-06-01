@@ -46,9 +46,10 @@ public class FoodDao {
 	}
 
 	public List<Adiacenza> getAdiacenze(){
-			String sql = "SELECT fc1.food_code as cod1, fc2.food_code as cod2, AVG(c1.condiment_calories) AS calMedie " + 
-					"FROM food_condiment AS fc1, food_condiment AS fc2, condiment AS c1, condiment AS c2 " + 
-					"WHERE fc1.food_code>fc2.food_code AND c1.condiment_code=c2.condiment_code AND " + 
+			String sql = "SELECT fc1.food_code as cod1, f1.display_name as nome1, fc2.food_code as cod2, f2.display_name as nome2, AVG(c1.condiment_calories) AS calMedie " + 
+					"FROM food_condiment AS fc1, food_condiment AS fc2, condiment AS c1, condiment AS c2, food AS f1, food AS f2 " + 
+					"WHERE f1.food_code=fc1.food_code AND f2.food_code=fc2.food_code " + 
+					"AND fc1.food_code>fc2.food_code AND c1.condiment_code=c2.condiment_code AND " + 
 					"fc1.condiment_code=c1.condiment_code AND fc2.condiment_code=c2.condiment_code " + 
 					"GROUP BY fc1.food_code, fc2.food_code " ;
 			List<Adiacenza> adiacenze = new ArrayList<Adiacenza>();
@@ -60,8 +61,8 @@ public class FoodDao {
 				
 				while(res.next()) {
 					try {
-						Food f1= new Food(res.getInt("cod1"));
-						Food f2 = new Food(res.getInt("cod2"));
+						Food f1= new Food(res.getInt("cod1"), res.getString("nome1"));
+						Food f2 = new Food(res.getInt("cod2"),res.getString("nome2"));
 						Adiacenza a = new Adiacenza(f1, f2, res.getInt("calMedie"));
 						adiacenze.add(a);
 					} catch (Throwable t) {
